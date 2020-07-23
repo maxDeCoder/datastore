@@ -1,0 +1,193 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Tanvi and Vedant's thing</title>
+        <style>
+            .class_lable{
+                font-family:sans-serif;
+            }
+            .textbox { 
+                font-family: sans-serif;
+                -moz-border-radius-bottomright: 30px; 
+                -webkit-border-bottom-right-radius: 30px; 
+                border-bottom-right-radius: 30px; 
+                border: 1px solid #848484; 
+                outline:0;
+                padding-right:20px; 
+                resize:both;
+                overflow: auto;
+                min-width: 500px;
+                min-height: 200px;
+            } 
+            .textbox_pass{
+                -moz-border-radius-bottomright: 30px; 
+                -webkit-border-bottom-right-radius: 30px; 
+                border-bottom-right-radius: 30px; 
+                border: 1px solid #848484; 
+                outline:0;
+                padding-right:20px;
+                resize: vertical; 
+                overflow: auto; 
+                width: 200px; 
+                height: 25px;
+            }
+            .aside{
+                -moz-border-radius-bottomright: 30px; 
+                -webkit-border-bottom-right-radius: 30px; 
+                border-bottom-right-radius: 30px; 
+                border: 1px solid #848484; 
+                outline:0;
+                padding-right:20px;
+                overflow: auto;
+            }
+            .buttons {
+	            box-shadow:inset 0px 1px 0px 0px #ffffff;
+	            background:linear-gradient(to bottom, #ffffff 5%, #f6f6f6 100%);
+	            background-color:#ffffff;
+	            border-radius:6px;
+	            border:1px solid #dcdcdc;
+	            display:inline-block;
+	            cursor:pointer;
+	            color:#666666;
+	            font-family:Arial;
+	            font-size:15px;
+	            font-weight:bold;
+	            padding:6px 24px;
+	            text-decoration:none;
+	            text-shadow:0px 1px 0px #ffffff;
+            }
+            .buttons:hover {
+	            background:linear-gradient(to bottom, #f6f6f6 5%, #ffffff 100%);
+	            background-color:#f6f6f6;
+            }
+            .buttons:active {
+	            position:relative;
+	            top:1px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h2>
+            MESSAGES
+        </h2>
+        <hr>
+        <form>
+            <h4>
+                <label class="class_lable">SEND MESSAGES</label>
+            </h4>
+            <h3>
+                <h4><label class="class_lable">USER:</label><br></h4>
+                <input type = "radio" id="radio_vedant" name="id" value="Vedant">
+                <label class = "class_lable">Vedant</label><br>
+                <input type = "radio" id="radio_tanvi" name="id" value="Vedant">
+                <label class="class_lable">Tanvi</label><br>
+                <br>
+                <textarea type="text" placeholder="please type your message" id="msg" class="textbox"></textarea><br><br>
+                <input type="password" placeholder="password" class="textbox_pass" id="pass"><br><br>
+                <input type="submit" class="buttons" onclick="sendData()">
+            </h3>
+        </form>
+        
+        <hr>
+        <h4><label class="class_lable">MESSAGES</label></h4>
+        <button class="buttons" onclick="getData()">GET</button>
+        <button class="buttons" onclick="reset()">RESET ALL MESSAGES</button>
+        <hr>
+        <br>
+        <div id="currentData">
+
+        </div>
+    </body>
+    <script>
+        function sendData()
+        {
+            if(!document.getElementById("radio_vedant").checked && !document.getElementById("radio_tanvi").checked){alert("please select a user");}
+            else{
+                var user = "";
+                var message = document.getElementById('msg').value;
+                var pass = document.getElementById('pass').value;
+
+                if(document.getElementById("radio_vedant").checked){user = document.getElementById("radio_vedant").value;}
+                else{document.getElementById("radio_tanvi").value;}
+
+                const data = {
+                    user : user,
+                    message : message,
+                    pass : pass
+                };
+
+                const options = {
+                    method: "POST",
+                    headers: {'Content-Type' : 'application/json'},
+                    body: JSON.stringify(data)
+                };
+
+                fetch('/home/update/', options).then(data => data.json).then(data => {
+                    console.log(data.status);
+                });
+            }
+        }
+
+        async function getData(){
+            const response = await fetch('/get/');
+            const data = await response.json();
+            if(data.length != 0)
+		    {
+			    for(var i = 0;i < data.length;i++)
+			    {
+				    for(var j = i;j < data.length;j++)
+				    {
+					    if(data[i].timestamp < data[j].timestamp)
+					    {
+						    var temp = data[i];
+					    	data[i] = data[j];
+						    data[j] = temp;
+					    }
+				    }
+			    }
+			    updatePage(data);
+		    }else{
+			    showError();
+		    }
+        }
+        function showError() {
+            document.getElementById("currentData").innerHTML =
+            '<lable class = "class_lable">' +
+            "NO DATA AVAILABLE" +
+            "</lable>";
+        }
+
+        function updatePage(data)
+	    {
+		    var element = document.getElementById('currentData');
+            const divTag = "<div class=\"subdata\">";
+            const close_div = "</div>";
+            const aside = "<aside class = \"aside\">"
+            const close_aside = "</aside>"
+            const p = "<p>";
+            const close_p = "</p>";
+		    const br = "<br>";
+		    const hr = "<hr>";
+		    const h4 = "<h4>";
+		    const closeh4 = "</h4>";
+            const lable = "<lable class=\"class_lable\">";
+            const close_lable = "</lable>"
+		    var update = "";
+		    for(var i = 0;i < data.length;i++){
+			    update += divTag+aside+lable+"USER: "+data[i].user+close_lable+br+lable+"MESSAGE: "+close_lable+br+p+data[i].message+close_p+close_aside+close_div+br;
+		    }
+
+		    element.innerHTML = update;
+        }
+        
+        function reset()
+        {
+            const options = {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+            };
+            fetch("/reset/", options);
+        }
+    </script>
+</html>

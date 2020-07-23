@@ -1,0 +1,25 @@
+{
+  "name": "datastore",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start" : "node server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maxDeCoder/datastore.git"
+  },
+  "author": "Vedant Jumle",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maxDeCoder/datastore/issues"
+  },
+  "homepage": "https://github.com/maxDeCoder/datastore#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "nedb": "^1.8.0",
+    "nodemon": "^2.0.4"
+  }
+}
